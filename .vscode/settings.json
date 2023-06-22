@@ -1,0 +1,19 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "workbench.colorCustomizations": {
+    "sideBar.background": "#0F1927",
+    "editor.background": "#171C2C",
+    "tab.activeBackground": "#0e4949",
+    "activityBar.background": "#183136",
+    "titleBar.activeBackground": "#21454C",
+    "titleBar.activeForeground": "#F9FCFC"
+  }
+}
