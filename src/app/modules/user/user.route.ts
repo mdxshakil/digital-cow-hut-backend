@@ -1,13 +1,19 @@
 import express from 'express';
+import { UserRole } from '../../../enums/userRole';
+import authGuard from '../../middlewares/authGuard';
 import { UserController } from './user.controller';
 const router = express.Router();
 
-router.get('/:id', UserController.getSingleUser);
+router.get('/:id', authGuard(UserRole.ADMIN), UserController.getSingleUser);
 
-router.get('/', UserController.getUsers);
+router.get('/', authGuard(UserRole.ADMIN), UserController.getUsers);
 
-router.delete('/:id', UserController.deleteSingleUser);
+router.delete(
+  '/:id',
+  authGuard(UserRole.ADMIN),
+  UserController.deleteSingleUser
+);
 
-router.patch('/:id', UserController.updateUser);
+router.patch('/:id', authGuard(UserRole.ADMIN), UserController.updateUser);
 
 export const UserRoutes = router;

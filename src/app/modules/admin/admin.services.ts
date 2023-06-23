@@ -8,7 +8,11 @@ import { Admin } from './admin.model';
 
 const createAdmin = async (adminData: IAdmin): Promise<IAdmin | null> => {
   const createdAdmin = await Admin.create(adminData);
-  return createdAdmin;
+  if (!createdAdmin) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create admin');
+  }
+  const createdNewAdmin = await Admin.findOne({ _id: createdAdmin._id });
+  return createdNewAdmin;
 };
 
 const loginAdmin = async (
@@ -33,7 +37,7 @@ const loginAdmin = async (
   const { _id, role } = isAdminExists;
   const accessToken = jwtHelper.createToken(
     {
-      adminId: _id,
+      userId: _id,
       role,
     },
     config.jwt.secret as Secret,

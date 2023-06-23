@@ -9,7 +9,11 @@ import { ILoginUser, ILoginUserResponse, IUser } from './auth.interface';
 
 const createUser = async (userData: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(userData);
-  return createdUser;
+  if (!createdUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create user');
+  }
+  const createdNewUser = await User.findOne({ _id: createdUser._id });
+  return createdNewUser;
 };
 
 const loginUser = async (

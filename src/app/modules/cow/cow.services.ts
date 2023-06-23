@@ -106,12 +106,14 @@ const deleteCow = async (cowId: string): Promise<ICow | null> => {
 
 const updateCow = async (
   cowId: string,
+  sellerId: string,
   updatedData: Partial<ICow>
 ): Promise<ICow | null> => {
   const isExist = await Cow.findOne({ _id: cowId });
   if (!isExist) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not found !');
   }
+
   const cow = await Cow.findByIdAndUpdate({ _id: cowId }, updatedData, {
     new: true,
   }).populate('seller');
