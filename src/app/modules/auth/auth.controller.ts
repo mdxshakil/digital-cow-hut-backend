@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import httpStatus from 'http-status';
 import config from '../../../config';
 import ApiError from '../../../errors/apiError';
+import { IRefreshTokenResponse } from '../../../interfaces/token';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { ILoginUserResponse, IUser } from './auth.interface';
@@ -45,7 +46,27 @@ const loginUser: RequestHandler = catchAsync(
   }
 );
 
+const refreshToken: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies;
+    const result = await AuthService.refreshToken(refreshToken);
+    const cookieOptions = {
+      secure: config.env === 'production' ? true : false,
+      httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
+    sendResponse<IRefreshTokenResponse>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'New access token generated successfully !',
+      data: result,
+    });
+  }
+);
+
 export const AuthController = {
   createUser,
   loginUser,
+  refreshToken,
 };
