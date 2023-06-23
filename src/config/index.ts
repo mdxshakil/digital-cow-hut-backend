@@ -8,4 +8,10 @@ export default {
   db_uri: process.env.DB_URI,
   env: process.env.NODE_ENV,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    refresh_secret: process.env.JWT_RERESH_SECRET,
+    expires_in: process.env.JWT_EXPIRES_IN,
+    refresh_expires_in: process.env.JWT_RERESH_EXPIRES_IN,
+  },
 };

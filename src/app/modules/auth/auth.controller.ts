@@ -1,21 +1,51 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import httpStatus from 'http-status';
+import config from '../../../config';
+import ApiError from '../../../errors/apiError';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
-import { IUser } from './auth.interface';
+import { ILoginUserResponse, IUser } from './auth.interface';
 import { AuthService } from './auth.services';
 
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  const userData = req.body;
-  const result = await AuthService.createUser(userData);
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'User created successfully',
-    data: result,
-  });
-});
+const createUser: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const userData = req.body;
+    const result = await AuthService.createUser(userData);
+    sendResponse<IUser>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'User created successfully',
+      data: result,
+    });
+  }
+);
+
+const loginUser: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const userLoginData = req.body;
+    const result = await AuthService.loginUser(userLoginData);
+
+    if (!result?.accessToken || !result?.refreshToken) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Login failed');
+    }
+    const { refreshToken, ...others } = result;
+
+    const cookieOptions = {
+      secure: config.env === 'production' ? true : false,
+      httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
+    sendResponse<ILoginUserResponse>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'User logged in successfully',
+      data: others,
+    });
+  }
+);
 
 export const AuthController = {
   createUser,
+  loginUser,
 };

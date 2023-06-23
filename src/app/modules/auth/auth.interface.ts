@@ -16,3 +16,13 @@ export type IUser = {
 };
 
 export type UserModel = Model<IUser, Record<string, unknown>>;
+
+export type ILoginUserResponse = {
+  accessToken: string;
+  refreshToken?: string;
+};
+
+export type ILoginUser = {
+  phoneNumber: string;
+  password: string;
+};
