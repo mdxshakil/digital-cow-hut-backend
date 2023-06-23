@@ -1,8 +1,10 @@
 import { Request, RequestHandler, Response } from 'express';
 import httpStatus from 'http-status';
+import config from '../../../config';
+import ApiError from '../../../errors/apiError';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
-import { IAdmin } from './admin.interface';
+import { IAdmin, ILoginAdminResponse } from './admin.interface';
 import { AdminService } from './admin.services';
 
 const createAdmin: RequestHandler = catchAsync(
@@ -18,6 +20,32 @@ const createAdmin: RequestHandler = catchAsync(
   }
 );
 
+const loginAdmin: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const adminLoginData = req.body;
+    const result = await AdminService.loginAdmin(adminLoginData);
+
+    if (!result?.accessToken || !result?.refreshToken) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Login failed');
+    }
+    const { refreshToken, ...others } = result;
+
+    const cookieOptions = {
+      secure: config.env === 'production' ? true : false,
+      httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
+    sendResponse<ILoginAdminResponse>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Admin logged in successfully',
+      data: others,
+    });
+  }
+);
+
 export const AdminController = {
   createAdmin,
+  loginAdmin,
 };
