@@ -17,7 +17,10 @@ const placeOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.getAllOrders();
+  const userId = req.user?.userId;
+  const role = req.user?.role;
+
+  const result = await OrderService.getAllOrders(userId, role);
   sendResponse<IOrder[]>(res, {
     success: true,
     statusCode: httpStatus.OK,
