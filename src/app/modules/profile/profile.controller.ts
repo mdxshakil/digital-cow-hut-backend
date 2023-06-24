@@ -19,6 +19,25 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  const role = req.user?.role;
+  const updatedData = req.body;
+  const result = await ProfileService.updateMyProfile(
+    userId,
+    role,
+    updatedData
+  );
+
+  sendResponse<IUser | IAdmin>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User's information retrieved successfully",
+    data: result,
+  });
+});
+
 export const ProfileController = {
   getMyProfile,
+  updateMyProfile,
 };
