@@ -100,15 +100,12 @@ const getAllOrders = async (
   role: string
 ): Promise<IOrder[] | null> => {
   if (role === 'admin') {
-    const result = await Order.find().populate('cow').populate('buyer');
-    return result;
+    return await Order.find().populate('cow').populate('buyer');
   } else if (role === 'buyer') {
-    const result = await Order.find({ buyer: userId })
+    return await Order.find({ buyer: userId })
       .populate('cow')
       .populate('buyer');
-    return result;
-  }
-  if (role === 'seller') {
+  } else if (role === 'seller') {
     const result = await Order.find()
       .populate({
         path: 'cow',
@@ -116,10 +113,8 @@ const getAllOrders = async (
       })
       .populate('buyer');
     //return empty array if current seller has no orders
-    const orders = result?.[0]?.cow ? result : [];
-    return orders;
+    return result?.[0]?.cow ? result : [];
   } else {
-    //throw error for unrecognized/invalid roles
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
   }
 };
