@@ -124,7 +124,39 @@ const getAllOrders = async (
   }
 };
 
+const getSingleOrder = async (
+  userId: string,
+  role: string,
+  orderId: string
+): Promise<IOrder | null> => {
+  //check if the order exists or not
+  const selectedOrder = await Order.findOne({ _id: orderId });
+  if (!selectedOrder) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'No order data found with this id'
+    );
+  }
+  const cowOfSelectedOrder = await Cow.findOne({ _id: selectedOrder?.cow });
+
+  let result = null;
+  if (role === 'admin') {
+    result = selectedOrder;
+  } else if (role === 'buyer' && selectedOrder?.buyer.toString() === userId) {
+    result = selectedOrder;
+  } else if (
+    role === 'seller' &&
+    cowOfSelectedOrder?.seller.toString() === userId
+  ) {
+    result = selectedOrder;
+  } else {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Unauthorized access');
+  }
+  return result;
+};
+
 export const OrderService = {
   placeOrder,
   getAllOrders,
+  getSingleOrder,
 };

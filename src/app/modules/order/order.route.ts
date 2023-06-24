@@ -11,4 +11,10 @@ router.get(
   OrderController.getAllOrders
 );
 
+router.get(
+  '/:id',
+  authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
+  OrderController.getSingleOrder
+);
+
 export const OrderRoutes = router;
