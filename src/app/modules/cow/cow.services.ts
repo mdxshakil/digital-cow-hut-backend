@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
 import { SortOrder } from 'mongoose';
 import ApiError from '../../../errors/apiError';
-import { IGenericResponse } from '../../../interface/common';
-import { IPaginationOptions } from '../../../interface/pagination';
+import { IGenericResponse } from '../../../interfaces/common';
+import { IPaginationOptions } from '../../../interfaces/pagination';
 import { paginationHelper } from '../../../shared/paginationHelper';
 import { User } from '../user/user.model';
 import { cowSearchableFields } from './cow.constant';
