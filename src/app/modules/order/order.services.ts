@@ -131,6 +131,7 @@ const getSingleOrder = async (
 ): Promise<IOrder | null> => {
   //check if the order exists or not
   const selectedOrder = await Order.findOne({ _id: orderId });
+
   if (!selectedOrder) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
@@ -139,20 +140,19 @@ const getSingleOrder = async (
   }
   const cowOfSelectedOrder = await Cow.findOne({ _id: selectedOrder?.cow });
 
-  let result = null;
+  //return order data according to user role and userId
   if (role === 'admin') {
-    result = selectedOrder;
+    return (await selectedOrder.populate('cow')).populate('buyer');
   } else if (role === 'buyer' && selectedOrder?.buyer.toString() === userId) {
-    result = selectedOrder;
+    return (await selectedOrder.populate('cow')).populate('buyer');
   } else if (
     role === 'seller' &&
     cowOfSelectedOrder?.seller.toString() === userId
   ) {
-    result = selectedOrder;
+    return (await selectedOrder.populate('cow')).populate('buyer');
   } else {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Unauthorized access');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized Access');
   }
-  return result;
 };
 
 export const OrderService = {
