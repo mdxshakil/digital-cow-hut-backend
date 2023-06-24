@@ -8,6 +8,7 @@ import { User } from '../user/user.model';
 import { cowSearchableFields } from './cow.constant';
 import { ICow, ICowFilters } from './cow.interface';
 import { Cow } from './cow.model';
+import { verifyCowAndSeller } from './cow.utils';
 
 const postCow = async (cowData: ICow): Promise<ICow | null> => {
   const cowSeller = await User.findById({ _id: cowData.seller });
@@ -95,28 +96,28 @@ const getSingleCow = async (cowId: string): Promise<ICow | null> => {
   return cow;
 };
 
-const deleteCow = async (cowId: string): Promise<ICow | null> => {
-  const isExist = await Cow.findOne({ _id: cowId });
-  if (!isExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not found !');
-  }
-  const cow = await Cow.findByIdAndDelete({ _id: cowId }).populate('seller');
-  return cow;
-};
-
 const updateCow = async (
   cowId: string,
   sellerId: string,
   updatedData: Partial<ICow>
 ): Promise<ICow | null> => {
-  const isExist = await Cow.findOne({ _id: cowId });
-  if (!isExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not found !');
-  }
+  //check if the cow exists and the seller is valid
+  await verifyCowAndSeller(cowId, sellerId);
 
   const cow = await Cow.findByIdAndUpdate({ _id: cowId }, updatedData, {
     new: true,
   }).populate('seller');
+  return cow;
+};
+
+const deleteCow = async (
+  cowId: string,
+  sellerId: string
+): Promise<ICow | null> => {
+  //check if the cow exists and the seller is valid
+  await verifyCowAndSeller(cowId, sellerId);
+
+  const cow = await Cow.findByIdAndDelete({ _id: cowId }).populate('seller');
   return cow;
 };
 

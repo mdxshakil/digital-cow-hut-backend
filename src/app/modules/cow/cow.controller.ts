@@ -43,7 +43,10 @@ const getSingleCow = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteCow = catchAsync(async (req: Request, res: Response) => {
-  const result = await CowService.deleteCow(req.params.id);
+  const cowId = req.params?.id;
+  const sellerId = req.user?.userId;
+
+  const result = await CowService.deleteCow(cowId, sellerId);
   sendResponse<ICow>(res, {
     success: true,
     statusCode: httpStatus.OK,
