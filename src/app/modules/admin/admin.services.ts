@@ -59,7 +59,16 @@ const loginAdmin = async (
   };
 };
 
+const getAdminProfile = async (userId: string): Promise<IAdmin | null> => {
+  const isExists = await Admin.findOne({ _id: userId });
+  if (!isExists) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No admin found with this id');
+  }
+  return isExists;
+};
+
 export const AdminService = {
   createAdmin,
   loginAdmin,
+  getAdminProfile,
 };

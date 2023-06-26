@@ -1,5 +1,8 @@
+import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
+import config from '../../../config';
 import ApiError from '../../../errors/apiError';
+import { IAdmin } from '../admin/admin.interface';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -57,9 +60,58 @@ const updateUser = async (
   return result;
 };
 
+const getMyProfile = async (userId: string): Promise<IUser | null> => {
+  const isExist = await User.findOne({ _id: userId });
+  if (!isExist) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
+  return isExist;
+};
+
+const updateMyProfile = async (
+  userId: string,
+  updatedData: Partial<IUser>
+): Promise<IUser | null> => {
+  // check if the user exists or not
+  const isExist = await User.findOne({ _id: userId });
+
+  if (!isExist) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access !');
+  }
+
+  const { name, password, ...userData } = updatedData;
+
+  const updatedUserData: Partial<IUser> = { ...userData };
+
+  // dynamically handling user name object
+  if (name && Object.keys(name).length > 0) {
+    Object.keys(name).forEach(key => {
+      const nameKey = `name.${key}` as keyof Partial<IUser | IAdmin>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (updatedUserData as any)[nameKey] = name[key as keyof typeof name];
+    });
+  }
+
+  if (password) {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    updatedUserData.password = hashedPassword;
+  }
+
+  const result = await User.findOneAndUpdate({ _id: userId }, updatedUserData, {
+    new: true,
+  });
+
+  return result;
+};
+
 export const UserService = {
   getUsers,
   getSingleUser,
   deleteSingleUser,
   updateUser,
+  getMyProfile,
+  updateMyProfile,
 };

@@ -45,7 +45,22 @@ const loginAdmin: RequestHandler = catchAsync(
   }
 );
 
+const getAdminProfile: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const adminId = req.user?.userId;
+    const result = await AdminService.getAdminProfile(adminId);
+
+    sendResponse<IAdmin>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Admin profile info retrived successfully',
+      data: result,
+    });
+  }
+);
+
 export const AdminController = {
   createAdmin,
   loginAdmin,
+  getAdminProfile,
 };
