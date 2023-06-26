@@ -1,4 +1,6 @@
+import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
+import config from '../../../config';
 import ApiError from '../../../errors/apiError';
 import { IAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
@@ -36,7 +38,7 @@ const updateMyProfile = async (
     throw new ApiError(httpStatus.BAD_REQUEST, 'User not found !');
   }
 
-  const { name, ...userData } = updatedData;
+  const { name, password, ...userData } = updatedData;
 
   const updatedUserData: Partial<IUser | IAdmin> = { ...userData };
 
@@ -48,6 +50,14 @@ const updateMyProfile = async (
       (updatedUserData as any)[nameKey] = name[key as keyof typeof name];
     });
   }
+  if (password) {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    updatedUserData.password = hashedPassword;
+  }
+
   let result = null;
   if (role === 'admin') {
     result = await Admin.findOneAndUpdate({ _id: userId }, updatedUserData, {

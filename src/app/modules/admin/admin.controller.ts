@@ -39,7 +39,7 @@ const loginAdmin: RequestHandler = catchAsync(
     sendResponse<ILoginAdminResponse>(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: 'Admin logged in successfully',
+      message: 'User logged in successfully',
       data: others,
     });
   }

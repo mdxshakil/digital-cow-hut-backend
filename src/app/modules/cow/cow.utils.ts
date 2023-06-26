@@ -8,7 +8,7 @@ export const verifyCowAndSeller = async (cowId: string, sellerId: string) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not found !');
   }
   // Check if the user is the seller of the cow
-  if (isExist.seller.toString() !== sellerId) {
+  if (isExist.seller?.toString() !== sellerId) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Unauthorized');
   }
 };

@@ -5,14 +5,22 @@ import { Cow } from '../cow/cow.model';
 import { User } from '../user/user.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
+const ObjectId = mongoose.Types.ObjectId;
 
-const placeOrder = async (orderData: IOrder): Promise<IOrder | null> => {
+const placeOrder = async (
+  orderData: IOrder,
+  userId: string
+): Promise<IOrder | null> => {
   const { buyer, cow } = orderData;
   if (!buyer || !cow) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       'Cow and buyer both id is required'
     );
+  }
+  //if current buyer id doesnot matches with authorized user id then throw error
+  if (userId !== buyer.toString()) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Unauthorized access');
   }
   const cowBuyer = await User.findById({ _id: buyer });
   const selectedCow = await Cow.findById({ _id: cow });
@@ -106,14 +114,32 @@ const getAllOrders = async (
       .populate('cow')
       .populate('buyer');
   } else if (role === 'seller') {
-    const result = await Order.find()
-      .populate({
-        path: 'cow',
-        match: { seller: userId },
-      })
-      .populate('buyer');
-    //return empty array if current seller has no orders
-    return result?.[0]?.cow ? result : [];
+    const convertedUserId = new ObjectId(userId);
+    const orders = await Cow.aggregate([
+      {
+        $match: {
+          seller: convertedUserId,
+          label: 'sold out',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: '_id',
+          foreignField: 'cow',
+          as: 'matchingOrders',
+        },
+      },
+      {
+        $unwind: '$matchingOrders',
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$matchingOrders',
+        },
+      },
+    ]);
+    return orders;
   } else {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
   }
