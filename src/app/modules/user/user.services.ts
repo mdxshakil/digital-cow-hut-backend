@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import config from '../../../config';
 import ApiError from '../../../errors/apiError';
-import { IAdmin } from '../admin/admin.interface';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -86,7 +85,7 @@ const updateMyProfile = async (
   // dynamically handling user name object
   if (name && Object.keys(name).length > 0) {
     Object.keys(name).forEach(key => {
-      const nameKey = `name.${key}` as keyof Partial<IUser | IAdmin>;
+      const nameKey = `name.${key}` as keyof Partial<IUser>;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (updatedUserData as any)[nameKey] = name[key as keyof typeof name];
     });

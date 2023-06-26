@@ -13,6 +13,10 @@ router.get(
   authGuard(UserRole.ADMIN),
   AdminController.getAdminProfile
 );
-// router.get('/my-profile', AdminController.updateMyProfile);
+router.patch(
+  '/my-profile',
+  authGuard(UserRole.ADMIN),
+  AdminController.updateAdminProfile
+);
 
 export const AdminRoutes = router;
