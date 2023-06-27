@@ -59,18 +59,20 @@ const getAdminProfile: RequestHandler = catchAsync(
   }
 );
 
-const updateAdminProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
-  const updatedData = req.body;
-  const result = await AdminService.updateAdminProfile(userId, updatedData);
+const updateAdminProfile: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    const updatedData = req.body;
+    const result = await AdminService.updateAdminProfile(userId, updatedData);
 
-  sendResponse<IAdmin>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Admin's information updated successfully",
-    data: result,
-  });
-});
+    sendResponse<IAdmin>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Admin's information updated successfully",
+      data: result,
+    });
+  }
+);
 
 export const AdminController = {
   createAdmin,

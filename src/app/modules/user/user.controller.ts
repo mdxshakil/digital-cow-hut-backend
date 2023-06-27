@@ -55,30 +55,34 @@ const updateUser: RequestHandler = catchAsync(
   }
 );
 
-const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
-  const result = await UserService.getMyProfile(userId);
+const getMyProfile: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    const result = await UserService.getMyProfile(userId);
 
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User's information retrieved successfully",
-    data: result,
-  });
-});
+    sendResponse<IUser>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User's information retrieved successfully",
+      data: result,
+    });
+  }
+);
 
-const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
-  const updatedData = req.body;
-  const result = await UserService.updateMyProfile(userId, updatedData);
+const updateMyProfile: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    const updatedData = req.body;
+    const result = await UserService.updateMyProfile(userId, updatedData);
 
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User's information retrieved successfully",
-    data: result,
-  });
-});
+    sendResponse<IUser>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User's information retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const UserController = {
   getUsers,
