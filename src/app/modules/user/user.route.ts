@@ -6,13 +6,13 @@ const router = express.Router();
 
 router.get(
   '/my-profile',
-  authGuard(UserRole.ADMIN, UserRole.BUYER, UserRole.SELLER),
+  authGuard(UserRole.BUYER, UserRole.SELLER),
   UserController.getMyProfile
 );
 
 router.patch(
   '/my-profile',
-  authGuard(UserRole.ADMIN, UserRole.BUYER, UserRole.SELLER),
+  authGuard(UserRole.BUYER, UserRole.SELLER),
   UserController.updateMyProfile
 );
 
