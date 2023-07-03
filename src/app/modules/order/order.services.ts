@@ -108,10 +108,26 @@ const getAllOrders = async (
   role: string
 ): Promise<IOrder[] | null> => {
   if (role === 'admin') {
-    return await Order.find().populate('cow').populate('buyer');
+    return await Order.find()
+      .populate({
+        path: 'cow',
+        populate: [
+          {
+            path: 'seller',
+          },
+        ],
+      })
+      .populate('buyer');
   } else if (role === 'buyer') {
     return await Order.find({ buyer: userId })
-      .populate('cow')
+      .populate({
+        path: 'cow',
+        populate: [
+          {
+            path: 'seller',
+          },
+        ],
+      })
       .populate('buyer');
   } else if (role === 'seller') {
     const convertedUserId = new ObjectId(userId);
@@ -138,7 +154,11 @@ const getAllOrders = async (
           newRoot: '$matchingOrders',
         },
       },
+      //extra steps
     ]);
+    // Populate the cow and buyer fields
+    await Order.populate(orders, { path: 'cow', populate: { path: 'seller' } });
+    await Order.populate(orders, { path: 'buyer' });
     return orders;
   } else {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
