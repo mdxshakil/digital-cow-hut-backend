@@ -1,9 +1,11 @@
 import { ErrorRequestHandler } from 'express';
 import httpStatus from 'http-status';
+import { ZodError } from 'zod';
 import config from '../../config';
 import ApiError from '../../errors/apiError';
 import { handleCastError } from '../../errors/handleCastError';
 import handleValidationError from '../../errors/handleValidationError';
+import handleZodError from '../../errors/handleZodError';
 import { IGenericErrorMessage } from '../../interfaces/error';
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -30,6 +32,11 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   } else if (error.name === 'CastError') {
     const simplifiedError = handleCastError(error);
     statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorMessages = simplifiedError.errorMessages;
+  } else if (error instanceof ZodError) {
+    const simplifiedError = handleZodError(error);
+    statusCode = simplifiedError?.statusCode;
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;
   } else if (error instanceof ApiError) {

@@ -1,12 +1,22 @@
 import express from 'express';
 import { UserRole } from '../../../enums/userRole';
 import authGuard from '../../middlewares/authGuard';
+import zodGuard from '../../middlewares/validateRequest';
 import { AdminController } from './admin.controller';
+import { adminValidation } from './admin.validation';
 const router = express.Router();
 
-router.post('/create-admin', AdminController.createAdmin);
+router.post(
+  '/create-admin',
+  zodGuard(adminValidation.createAdminZodSchema),
+  AdminController.createAdmin
+);
 
-router.post('/login', AdminController.loginAdmin);
+router.post(
+  '/login',
+  zodGuard(adminValidation.adminLoginZodSchema),
+  AdminController.loginAdmin
+);
 
 router.get(
   '/my-profile',

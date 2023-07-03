@@ -1,12 +1,17 @@
 import express from 'express';
-// import { UserRole } from '../../../enums/userRole';
-// import authGuard from '../../middlewares/authGuard';
 import { UserRole } from '../../../enums/userRole';
 import authGuard from '../../middlewares/authGuard';
+import zodGuard from '../../middlewares/validateRequest';
 import { CowController } from './cow.controller';
+import { cowValidation } from './cow.validation';
 const router = express.Router();
 
-router.post('/', authGuard(UserRole.SELLER), CowController.postCow);
+router.post(
+  '/',
+  zodGuard(cowValidation.postCowZodSchema),
+  authGuard(UserRole.SELLER),
+  CowController.postCow
+);
 
 router.get(
   '/',

@@ -1,10 +1,18 @@
 import express from 'express';
 import { UserRole } from '../../../enums/userRole';
 import authGuard from '../../middlewares/authGuard';
+import zodGuard from '../../middlewares/validateRequest';
 import { OrderController } from './order.controller';
+import { orderValidation } from './order.validation';
 const router = express.Router();
 
-router.post('/', authGuard(UserRole.BUYER), OrderController.placeOrder);
+router.post(
+  '/',
+  zodGuard(orderValidation.placeOrderZodSchema),
+  authGuard(UserRole.BUYER),
+  OrderController.placeOrder
+);
+
 router.get(
   '/',
   authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
