@@ -13,9 +13,9 @@ export type IUser = {
     firstName: string;
     lastName: string;
   };
-  address: string;
   budget?: number;
   income?: number;
+  profilePicture: string;
 };
 
 export type IUserMethods = {

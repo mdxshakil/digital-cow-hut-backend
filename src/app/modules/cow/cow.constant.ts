@@ -33,6 +33,7 @@ export const cowFilterableFields = [
   'minPrice',
   'maxPrice',
   'location',
+  'label',
 ];
 
 export const cowSearchableFields = ['location', 'breed', 'category'];

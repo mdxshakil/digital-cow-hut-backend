@@ -10,6 +10,10 @@ import { IGenericErrorMessage } from '../../interfaces/error';
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  if (config.env === 'development') {
+    console.log(`GlobalErrorHandler ~~ ${error}`);
+  }
+
   let statusCode = 500;
   let message = 'Something went wrong';
   let errorMessages: IGenericErrorMessage[] = [];

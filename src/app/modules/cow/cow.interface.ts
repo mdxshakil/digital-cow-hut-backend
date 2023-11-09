@@ -26,6 +26,7 @@ export type ICowCategory = 'Dairy' | 'Beef' | 'Dual Purpose';
 export type ICow = {
   name: string;
   age: number;
+  image: string;
   price: number;
   location: ICowLocation;
   breed: ICowBreed;

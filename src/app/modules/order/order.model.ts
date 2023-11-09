@@ -12,6 +12,22 @@ const orderSchema = new Schema<IOrder, OrderModel>({
     ref: 'User',
     required: true,
   },
+  shippingAddress: {
+    type: String,
+    required: true,
+  },
+  contactNo: {
+    type: String,
+    required: true,
+  },
+  paymentStatus: {
+    type: Boolean,
+    required: true,
+  },
+  transactionId: {
+    type: String,
+    required: true,
+  },
 });
 
 export const Order = model<IOrder, OrderModel>('Order', orderSchema);

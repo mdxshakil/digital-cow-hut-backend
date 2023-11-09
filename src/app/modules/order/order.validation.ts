@@ -8,6 +8,12 @@ const placeOrderZodSchema = z.object({
     buyer: z.string({
       required_error: 'Buyer id is required',
     }),
+    shippingAddress: z.string({
+      required_error: 'Shipping address is required',
+    }),
+    contactNo: z.string({
+      required_error: 'Contact No. is required',
+    }),
   }),
 });
 

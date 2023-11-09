@@ -12,6 +12,9 @@ router.post(
   authGuard(UserRole.BUYER),
   OrderController.placeOrder
 );
+router.post('/payment-success/:transactionId', OrderController.successPayment);
+
+router.post('/payment-failed/:transactionId', OrderController.failedPayment);
 
 router.get(
   '/',

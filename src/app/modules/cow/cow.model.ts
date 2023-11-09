@@ -12,6 +12,10 @@ const cowSchema = new Schema<ICow, CowModel>(
       type: Number,
       required: true,
     },
+    image: {
+      type: String,
+      required: true,
+    },
     price: {
       type: Number,
       required: true,

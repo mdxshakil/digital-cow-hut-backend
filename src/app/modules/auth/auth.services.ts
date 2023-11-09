@@ -2,10 +2,9 @@ import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
 import config from '../../../config';
 import ApiError from '../../../errors/apiError';
-import { IRefreshTokenResponse } from '../../../interfaces/token';
 import { jwtHelper } from '../../../shared/jwtHelper';
 import { User } from '../user/user.model';
-import { ILoginUser, ILoginUserResponse, IUser } from './auth.interface';
+import { ILoginUser, IUser } from './auth.interface';
 
 const createUser = async (userData: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(userData);
@@ -16,9 +15,7 @@ const createUser = async (userData: IUser): Promise<IUser | null> => {
   return createdNewUser;
 };
 
-const loginUser = async (
-  userLoginData: ILoginUser
-): Promise<ILoginUserResponse | null> => {
+const loginUser = async (userLoginData: ILoginUser) => {
   const { phoneNumber, password } = userLoginData;
 
   const user = new User();
@@ -45,55 +42,42 @@ const loginUser = async (
     config.jwt.expires_in as string
   );
 
-  const refreshToken = jwtHelper.createToken(
-    {
-      userId: _id,
-      role,
-    },
-    config.jwt.refresh_secret as Secret,
-    config.jwt.refresh_expires_in as string
-  );
+  const userProfile = await User.findOne({ phoneNumber });
 
   return {
     accessToken,
-    refreshToken,
+    user: {
+      userId: userProfile?._id,
+      phoneNumber: userProfile?.phoneNumber,
+      role: userProfile?.role,
+      profilePicture: userProfile?.profilePicture,
+      name: {
+        firstName: userProfile?.name.firstName,
+        lastName: userProfile?.name.lastName,
+      },
+    },
   };
 };
 
-const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
-  //verify token
-  let verifiedToken = null;
-  try {
-    verifiedToken = jwtHelper.verifyToken(
-      token,
-      config.jwt.refresh_secret as Secret
-    );
-  } catch (error) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Invalid refresh token!');
-  }
-  const { userId, role } = verifiedToken;
-  //Checking if the user is deleted or not
-  const user = new User();
-  const isUserExists = user.isUserExists(userId);
-  if (!isUserExists) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User doesnot exixts');
-  }
-  //if user exists generate a new token
-  const newAccessToken = jwtHelper.createToken(
-    {
-      userId,
-      role,
-    },
-    config.jwt.secret as Secret,
-    config.jwt.expires_in as string
-  );
+const persistLogin = async (userId: string) => {
+  const userProfile = await User.findOne({ _id: userId });
+
   return {
-    accessToken: newAccessToken,
+    user: {
+      userId: userProfile?._id,
+      phoneNumber: userProfile?.phoneNumber,
+      role: userProfile?.role,
+      profilePicture: userProfile?.profilePicture,
+      name: {
+        firstName: userProfile?.name.firstName,
+        lastName: userProfile?.name.lastName,
+      },
+    },
   };
 };
 
 export const AuthService = {
   createUser,
   loginUser,
-  refreshToken,
+  persistLogin,
 };

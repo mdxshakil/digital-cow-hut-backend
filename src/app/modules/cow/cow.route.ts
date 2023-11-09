@@ -13,11 +13,7 @@ router.post(
   CowController.postCow
 );
 
-router.get(
-  '/',
-  authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
-  CowController.getAllCows
-);
+router.get('/', CowController.getAllCows);
 
 router.get(
   '/:id',

@@ -9,6 +9,9 @@ const postCowZodSchema = z.object({
     age: z.number({
       required_error: 'Age is required!',
     }),
+    image: z.string({
+      required_error: 'Image is required!',
+    }),
     price: z.number({
       required_error: 'Price is required!',
     }),

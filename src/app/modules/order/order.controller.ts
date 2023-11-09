@@ -8,12 +8,37 @@ import { OrderService } from './order.services';
 const placeOrder: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const orderData = req.body;
-    const userId = req.user?.userId;
-    const result = await OrderService.placeOrder(orderData, userId);
-    sendResponse<IOrder>(res, {
+    const result = await OrderService.placeOrder(orderData);
+    sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: 'Cow purchased successfully',
+      data: result,
+    });
+  }
+);
+
+const successPayment: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { transactionId } = req.params;
+    const result = await OrderService.successPayment(transactionId, res);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Payment successful',
+      data: result,
+    });
+  }
+);
+
+const failedPayment: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { transactionId } = req.params;
+    const result = await OrderService.failedPayment(transactionId, res);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Payment failed',
       data: result,
     });
   }
@@ -52,6 +77,8 @@ const getSingleOrder: RequestHandler = catchAsync(
 
 export const OrderController = {
   placeOrder,
+  successPayment,
   getAllOrders,
   getSingleOrder,
+  failedPayment,
 };

@@ -11,6 +11,10 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethods>(
       required: true,
       unique: true,
     },
+    profilePicture: {
+      type: String,
+      require: true,
+    },
     role: {
       type: String,
       enum: userRole,
@@ -30,10 +34,6 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethods>(
         type: String,
         required: true,
       },
-    },
-    address: {
-      type: String,
-      required: true,
     },
     budget: {
       type: Number,

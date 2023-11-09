@@ -1,4 +1,6 @@
 import express from 'express';
+import { UserRole } from '../../../enums/userRole';
+import authGuard from '../../middlewares/authGuard';
 import zodGuard from '../../middlewares/validateRequest';
 import { AuthController } from './auth.controller';
 import { authValidation } from './auth.validation';
@@ -16,6 +18,10 @@ router.post(
   AuthController.loginUser
 );
 
-router.post('/refresh-token', AuthController.refreshToken);
+router.get(
+  '/persist-login',
+  authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
+  AuthController.persistLogin
+);
 
 export const AuthRoutes = router;
