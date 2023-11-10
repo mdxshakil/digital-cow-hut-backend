@@ -21,26 +21,14 @@ const placeOrder: RequestHandler = catchAsync(
 const successPayment: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { transactionId } = req.params;
-    const result = await OrderService.successPayment(transactionId, res);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: 'Payment successful',
-      data: result,
-    });
+    await OrderService.successPayment(transactionId, res);
   }
 );
 
 const failedPayment: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { transactionId } = req.params;
-    const result = await OrderService.failedPayment(transactionId, res);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: 'Payment failed',
-      data: result,
-    });
+    await OrderService.failedPayment(transactionId, res);
   }
 );
 
@@ -75,10 +63,25 @@ const getSingleOrder: RequestHandler = catchAsync(
   }
 );
 
+const getOrderByTransactionId: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { transactionId } = req.params;
+
+    const result = await OrderService.getOrderByTransactionId(transactionId);
+    sendResponse<IOrder>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Order information retrived successfully',
+      data: result,
+    });
+  }
+);
+
 export const OrderController = {
   placeOrder,
   successPayment,
   getAllOrders,
   getSingleOrder,
   failedPayment,
+  getOrderByTransactionId,
 };

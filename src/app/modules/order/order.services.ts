@@ -8,6 +8,7 @@ import SSLCommerzPayment from 'sslcommerz-lts';
 import config from '../../../config';
 import { sslData } from '../../../constants/ssl';
 import ApiError from '../../../errors/apiError';
+import { Cart } from '../cart/cart.model';
 import { Cow } from '../cow/cow.model';
 import { User } from '../user/user.model';
 import { IOrder } from './order.interface';
@@ -28,30 +29,64 @@ const placeOrder = async (orderData: IOrder) => {
   const apiResponse = await sslcz.init(data);
   const GatewayPageURL = await apiResponse.GatewayPageURL;
 
-  //make an order data to db with paymentStatus false
-  await Order.create({ ...orderData, transactionId, paymentStatus: false });
+  //make an order data to db with payment and delivery status false
+  await Order.create({
+    ...orderData,
+    seller: selectedCow?.seller,
+    transactionId,
+    paymentStatus: false,
+    isDelivered: false,
+  });
 
   return { redirectURL: GatewayPageURL };
 };
 
 const successPayment = async (transactionId: string, res: Response) => {
+  //update the order status
   const result = await Order.updateOne(
     { transactionId: transactionId },
     {
       paymentStatus: true,
     }
   );
-  //retrive the cow id from order data and change cow label to sold out
-  if (result.modifiedCount > 0) {
-    const orderData = await Order.findOne({ transactionId });
+
+  // Retrieve the order , buyer and cow data
+  const orderData = await Order.findOne({ transactionId });
+  const buyer = await User.findById({ _id: orderData?.buyer });
+  const seller = await User.findById({ _id: orderData?.seller });
+  const cow = await Cow.findById({ _id: orderData?.cow });
+
+  // If the order status was successfully updated then update the cow's label to 'sold out'
+  if (result.modifiedCount > 0 && orderData) {
     await Cow.updateOne(
-      { _id: orderData?.cow },
+      { _id: cow?._id },
       {
         label: 'sold out',
       }
     );
+    // Update the seller's income
+    if (
+      seller &&
+      seller.income !== undefined &&
+      cow &&
+      cow.price !== undefined
+    ) {
+      const updatedIncome = seller?.income + cow?.price;
+      await User.updateOne(
+        { _id: seller?._id },
+        {
+          income: updatedIncome,
+        }
+      );
+    }
+    // Remove item from buyers cart (if available)
+    await Cart.deleteOne({
+      buyerId: buyer?._id,
+      cowId: cow?._id,
+    });
   }
-  // finally redirect user to payment success page
+
+  // Finally, redirect the user to the payment success page
   res.redirect(`${config.client_base_url}/payment/success/${transactionId}`);
 };
 
@@ -88,36 +123,16 @@ const getAllOrders = async (
       })
       .populate('buyer');
   } else if (role === 'seller') {
-    const convertedUserId = new ObjectId(userId);
-    const orders = await Cow.aggregate([
-      {
-        $match: {
-          seller: convertedUserId,
-          label: 'sold out',
-        },
-      },
-      {
-        $lookup: {
-          from: 'orders',
-          localField: '_id',
-          foreignField: 'cow',
-          as: 'matchingOrders',
-        },
-      },
-      {
-        $unwind: '$matchingOrders',
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$matchingOrders',
-        },
-      },
-      //extra steps
-    ]);
-    // Populate the cow and buyer fields
-    await Order.populate(orders, { path: 'cow', populate: { path: 'seller' } });
-    await Order.populate(orders, { path: 'buyer' });
-    return orders;
+    return await Order.find({ seller: userId })
+      .populate({
+        path: 'cow',
+        populate: [
+          {
+            path: 'seller',
+          },
+        ],
+      })
+      .populate('buyer');
   } else {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
   }
@@ -154,10 +169,23 @@ const getSingleOrder = async (
   }
 };
 
+const getOrderByTransactionId = async (
+  transactionId: string
+): Promise<IOrder | null> => {
+  const result = await Order.findOne({ transactionId }).populate('cow');
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid transaction ID');
+  }
+
+  return result;
+};
+
 export const OrderService = {
   placeOrder,
   getAllOrders,
   getSingleOrder,
   successPayment,
   failedPayment,
+  getOrderByTransactionId,
 };

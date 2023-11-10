@@ -49,14 +49,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserMethods>(
 
 //set default income and budget values for users
 userSchema.pre('save', async function (next) {
-  if (this.role === 'buyer') {
-    if (!this.budget) {
-      this.budget = 0;
-    }
-    this.income = 0;
-  }
   if (this.role === 'seller') {
-    this.budget = 0;
     this.income = 0;
   }
   next();

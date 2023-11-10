@@ -12,6 +12,11 @@ const orderSchema = new Schema<IOrder, OrderModel>({
     ref: 'User',
     required: true,
   },
+  seller: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
   shippingAddress: {
     type: String,
     required: true,
@@ -27,6 +32,10 @@ const orderSchema = new Schema<IOrder, OrderModel>({
   transactionId: {
     type: String,
     required: true,
+  },
+  isDelivered: {
+    type: Boolean,
+    required: false,
   },
 });
 

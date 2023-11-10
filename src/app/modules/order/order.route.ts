@@ -28,4 +28,10 @@ router.get(
   OrderController.getSingleOrder
 );
 
+router.get(
+  '/transaction/:transactionId',
+  authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
+  OrderController.getOrderByTransactionId
+);
+
 export const OrderRoutes = router;
