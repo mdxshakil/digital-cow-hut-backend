@@ -50,7 +50,7 @@ const successPayment = async (transactionId: string, res: Response) => {
     }
   );
 
-  // Retrieve the order data , buyer data and cow data
+  // Retrieve the order data , buyer data and cow data..
   const orderData = await Order.findOne({ transactionId });
   const buyer = await User.findById({ _id: orderData?.buyer });
   const seller = await User.findById({ _id: orderData?.seller });
