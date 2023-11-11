@@ -1,20 +1,5 @@
-import {
-  ICowBreed,
-  ICowCategory,
-  ICowLabel,
-  ICowLocation,
-} from './cow.interface';
+import { ICowBreed, ICowCategory, ICowLabel } from './cow.interface';
 
-export const cowLocation: ICowLocation[] = [
-  'Dhaka',
-  'Chattogram',
-  'Barishal',
-  'Rajshahi',
-  'Sylhet',
-  'Comilla',
-  'Rangpur',
-  'Mymensingh',
-];
 export const cowBreed: ICowBreed[] = [
   'Brahman',
   'Nellore',
