@@ -1,16 +1,6 @@
 import { Model, Types } from 'mongoose';
 import { IUser } from '../auth/auth.interface';
 
-export type ICowLocation =
-  | 'Dhaka'
-  | 'Chattogram'
-  | 'Barishal'
-  | 'Rajshahi'
-  | 'Sylhet'
-  | 'Comilla'
-  | 'Rangpur'
-  | 'Mymensingh';
-
 export type ICowBreed =
   | 'Brahman'
   | 'Nellore'
@@ -28,7 +18,7 @@ export type ICow = {
   age: number;
   image: string;
   price: number;
-  location: ICowLocation;
+  location: string;
   breed: ICowBreed;
   weight: number;
   label: ICowLabel;

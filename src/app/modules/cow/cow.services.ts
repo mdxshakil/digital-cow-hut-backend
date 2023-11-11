@@ -16,13 +16,10 @@ const postCow = async (cowData: ICow): Promise<ICow | null> => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong seller id!');
   }
   if (cowSeller?.role !== 'seller') {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      'Selected user is not a seller!'
-    );
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Unauthorized access!');
   }
   const newCow = await Cow.create(cowData);
-  await newCow.populate('seller');
+  // await newCow.populate('seller');
   return newCow;
 };
 
@@ -88,6 +85,12 @@ const getAllCows = async (
   };
 };
 
+const getSellersCow = async (sellerId: string) => {
+  const result = await Cow.find({ seller: sellerId });
+
+  return result;
+};
+
 const getSingleCow = async (cowId: string): Promise<ICow | null> => {
   const cow = await Cow.findById({ _id: cowId }).populate('seller');
   if (!cow) {
@@ -124,6 +127,7 @@ const deleteCow = async (
 export const CowService = {
   postCow,
   getAllCows,
+  getSellersCow,
   getSingleCow,
   deleteCow,
   updateCow,

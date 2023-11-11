@@ -15,6 +15,8 @@ router.post(
 
 router.get('/', CowController.getAllCows);
 
+router.get('/my-cows', authGuard(UserRole.SELLER), CowController.getSellersCow);
+
 router.get(
   '/:id',
   authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),

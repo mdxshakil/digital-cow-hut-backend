@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { cowBreed, cowCategory, cowLabel, cowLocation } from './cow.constant';
+import { cowBreed, cowCategory, cowLabel } from './cow.constant';
 import { CowModel, ICow } from './cow.interface';
 
 const cowSchema = new Schema<ICow, CowModel>(
@@ -22,7 +22,6 @@ const cowSchema = new Schema<ICow, CowModel>(
     },
     location: {
       type: String,
-      enum: cowLocation,
       required: true,
     },
     breed: {

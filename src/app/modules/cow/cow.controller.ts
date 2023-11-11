@@ -36,6 +36,19 @@ const getAllCows: RequestHandler = catchAsync(
   }
 );
 
+const getSellersCow: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const sellerId = req?.user?.userId as string;
+    const result = await CowService.getSellersCow(sellerId);
+    sendResponse<ICow[]>(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Cows retrived successfully',
+      data: result,
+    });
+  }
+);
+
 const getSingleCow: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await CowService.getSingleCow(req.params.id);
@@ -81,6 +94,7 @@ const updateCow: RequestHandler = catchAsync(
 export const CowController = {
   postCow,
   getAllCows,
+  getSellersCow,
   getSingleCow,
   deleteCow,
   updateCow,
