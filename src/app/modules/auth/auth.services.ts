@@ -31,7 +31,7 @@ const loginUser = async (userLoginData: ILoginUser) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect!');
   }
 
-  //create access token and refresh token
+  //create access token
   const { _id, role } = isUserExists;
   const accessToken = jwtHelper.createToken(
     {

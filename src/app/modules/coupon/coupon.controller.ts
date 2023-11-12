@@ -15,6 +15,44 @@ const createCoupon = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllCoupon = catchAsync(async (req: Request, res: Response) => {
+  const result = await CouponService.getAllCoupon();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Coupons retrived successfully',
+    data: result,
+  });
+});
+
+const claimCoupon = catchAsync(async (req: Request, res: Response) => {
+  const { couponId } = req.params;
+  const { userId } = req.body;
+
+  const result = await CouponService.claimCoupon(couponId, userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Coupons claimed successfully',
+    data: result,
+  });
+});
+
+const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
+  const { couponId } = req.params;
+
+  const result = await CouponService.deleteCoupon(couponId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Coupon deleted successfully',
+    data: result,
+  });
+});
+
 export const CouponController = {
   createCoupon,
+  getAllCoupon,
+  claimCoupon,
+  deleteCoupon,
 };

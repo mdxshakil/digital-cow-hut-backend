@@ -13,4 +13,18 @@ router.post(
   CouponController.createCoupon
 );
 
+router.get('/', CouponController.getAllCoupon);
+
+router.post(
+  '/:couponId',
+  authGuard(UserRole.BUYER),
+  CouponController.claimCoupon
+);
+
+router.delete(
+  '/:couponId',
+  authGuard(UserRole.ADMIN),
+  CouponController.deleteCoupon
+);
+
 export const Couponroutes = router;

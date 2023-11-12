@@ -1,11 +1,10 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from '../auth/auth.interface';
 
 export type ICoupon = {
   couponCode: string;
   discountAmount: number;
   couponStock: number;
-  usedBy: IUser[];
+  usedBy: string;
 };
 
 const couponSchema = new Schema<ICoupon>(
@@ -13,6 +12,7 @@ const couponSchema = new Schema<ICoupon>(
     couponCode: {
       type: String,
       required: true,
+      unique: true,
     },
     discountAmount: {
       type: Number,

@@ -1,6 +1,6 @@
 import { Model, Types } from 'mongoose';
 
-export type IUserRole = 'buyer' | 'seller';
+export type IUserRole = 'buyer' | 'seller' | 'admin';
 
 export type UserModel = Model<IUser, Record<string, unknown>, IUserMethods>;
 

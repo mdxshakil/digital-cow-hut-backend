@@ -1,3 +1,3 @@
 import { IUserRole } from './auth.interface';
 
-export const userRole: IUserRole[] = ['seller', 'buyer'];
+export const userRole: IUserRole[] = ['seller', 'buyer', 'admin'];
