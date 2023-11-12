@@ -27,4 +27,10 @@ router.delete(
   CouponController.deleteCoupon
 );
 
+router.get(
+  '/:userId',
+  authGuard(UserRole.BUYER),
+  CouponController.getMyCoupons
+);
+
 export const Couponroutes = router;

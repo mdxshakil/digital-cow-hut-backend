@@ -7,14 +7,16 @@ export const sslData = (
   selectedCow: ICow | null,
   transactionId: string,
   buyer: IUser | null,
-  orderData: IOrder
+  orderData: IOrder,
+  discountedPrice?: number,
+  couponId?: string
 ) => {
   const data = {
-    total_amount: selectedCow?.price,
+    total_amount: discountedPrice ? discountedPrice : selectedCow?.price,
     currency: 'BDT',
     tran_id: transactionId,
-    success_url: `${config.base_url}/orders/payment-success/${transactionId}`,
-    fail_url: `${config.base_url}/orders/payment-failed/${transactionId}`,
+    success_url: `${config.server_base_url}/orders/payment-success/${transactionId}?couponId=${couponId}`,
+    fail_url: `${config.server_base_url}/orders/payment-failed/${transactionId}`,
     cancel_url: 'http://localhost:3030/cancel',
     ipn_url: 'http://localhost:3030/ipn',
     shipping_method: 'Courier',

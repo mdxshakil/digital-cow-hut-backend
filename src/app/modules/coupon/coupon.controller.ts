@@ -50,9 +50,22 @@ const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyCoupons = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  const result = await CouponService.getMyCoupons(userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Coupons retrived successfully',
+    data: result,
+  });
+});
+
 export const CouponController = {
   createCoupon,
   getAllCoupon,
   claimCoupon,
   deleteCoupon,
+  getMyCoupons,
 };

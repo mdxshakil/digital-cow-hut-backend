@@ -36,9 +36,18 @@ const deleteCoupon = async (couponId: string) => {
   return res;
 };
 
+const getMyCoupons = async (userId: string) => {
+  const res = await Coupon.find({ usedBy: userId }).select({
+    usedBy: 0,
+    couponStock: 0,
+  });
+  return res;
+};
+
 export const CouponService = {
   createCoupon,
   getAllCoupon,
   claimCoupon,
   deleteCoupon,
+  getMyCoupons,
 };

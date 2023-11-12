@@ -21,7 +21,8 @@ const placeOrder: RequestHandler = catchAsync(
 const successPayment: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { transactionId } = req.params;
-    await OrderService.successPayment(transactionId, res);
+    const { couponId } = req.query;
+    await OrderService.successPayment(transactionId, couponId as string, res);
   }
 );
 

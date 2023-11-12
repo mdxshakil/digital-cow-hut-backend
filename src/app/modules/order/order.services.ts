@@ -9,18 +9,42 @@ import config from '../../../config';
 import { sslData } from '../../../constants/ssl';
 import ApiError from '../../../errors/apiError';
 import { Cart } from '../cart/cart.model';
+import { Coupon } from '../coupon/coupon.model';
 import { Cow } from '../cow/cow.model';
 import { User } from '../user/user.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 const ObjectId = mongoose.Types.ObjectId;
 
-const placeOrder = async (orderData: IOrder) => {
+const placeOrder = async (orderData: IOrder & { couponId: string }) => {
   const selectedCow = await Cow.findOne({ _id: orderData.cow });
   const buyer = await User.findOne({ _id: orderData.buyer });
   const transactionId = new ObjectId().toString();
+  if (!selectedCow) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not found');
+  }
+  let discountedPrice;
+  if (orderData.couponId) {
+    const selectedCoupon = await Coupon.findById({ _id: orderData.couponId });
+    if (selectedCoupon) {
+      discountedPrice =
+        selectedCow?.price -
+        ((selectedCow?.price || 0) * (selectedCoupon.discountAmount || 0)) /
+          100;
+    } else {
+      // Handle the case where the coupon is not found
+      console.error(`Coupon with not found.`);
+    }
+  }
 
-  const data = sslData(selectedCow, transactionId, buyer, orderData);
+  const data = sslData(
+    selectedCow,
+    transactionId,
+    buyer,
+    orderData,
+    discountedPrice,
+    orderData.couponId
+  );
   const sslcz = new SSLCommerzPayment(
     config.ssl.storeId,
     config.ssl.storePass,
@@ -41,7 +65,11 @@ const placeOrder = async (orderData: IOrder) => {
   return { redirectURL: GatewayPageURL };
 };
 
-const successPayment = async (transactionId: string, res: Response) => {
+const successPayment = async (
+  transactionId: string,
+  couponId: string,
+  res: Response
+) => {
   //update the order status
   const result = await Order.updateOne(
     { transactionId: transactionId },
@@ -49,6 +77,23 @@ const successPayment = async (transactionId: string, res: Response) => {
       paymentStatus: true,
     }
   );
+
+  //decrease coupon stock if coupon was used in the order
+  if (couponId !== 'undefined') {
+    const selectedCoupon = await Coupon.findOne({ _id: couponId });
+    if (selectedCoupon) {
+      if (selectedCoupon.couponStock === 1) {
+        await Coupon.deleteOne({ _id: couponId });
+      } else {
+        await Coupon.updateOne(
+          { _id: couponId },
+          {
+            couponStock: selectedCoupon?.couponStock - 1,
+          }
+        );
+      }
+    }
+  }
 
   // Retrieve the order data , buyer data and cow data..
   const orderData = await Order.findOne({ transactionId });

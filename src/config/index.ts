@@ -18,6 +18,6 @@ export default {
     storeId: process.env.SSL_STORE_ID,
     storePass: process.env.SSL_STORE_PASS,
   },
-  base_url: process.env.SERVER_BASE_URL,
+  server_base_url: process.env.SERVER_BASE_URL,
   client_base_url: process.env.CLIENT_BASE_URL,
 };
