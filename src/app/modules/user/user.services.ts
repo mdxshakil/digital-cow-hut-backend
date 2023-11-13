@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import config from '../../../config';
 import ApiError from '../../../errors/apiError';
+import { Admin } from '../admin/admin.model';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -59,12 +60,14 @@ const updateUser = async (
   return result;
 };
 
-const getMyProfile = async (userId: string): Promise<IUser | null> => {
-  const isExist = await User.findOne({ _id: userId });
-  if (!isExist) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+const getMyProfile = async (userId: string, role: string) => {
+  let profile;
+  if (role === 'seller' || role === 'buyer') {
+    profile = await User.findOne({ _id: userId });
+  } else if (role === 'admin') {
+    profile = await Admin.findOne({ _id: userId });
   }
-  return isExist;
+  return profile;
 };
 
 const updateMyProfile = async (

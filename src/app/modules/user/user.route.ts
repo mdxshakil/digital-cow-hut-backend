@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get(
   '/my-profile',
-  authGuard(UserRole.BUYER, UserRole.SELLER),
+  authGuard(UserRole.BUYER, UserRole.SELLER, UserRole.ADMIN),
   UserController.getMyProfile
 );
 

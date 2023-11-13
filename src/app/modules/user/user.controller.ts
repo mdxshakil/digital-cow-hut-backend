@@ -57,10 +57,11 @@ const updateUser: RequestHandler = catchAsync(
 
 const getMyProfile: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const userId = req.user?.userId;
-    const result = await UserService.getMyProfile(userId);
+    const userId = req?.user?.userId;
+    const role = req?.user?.role;
+    const result = await UserService.getMyProfile(userId, role);
 
-    sendResponse<IUser>(res, {
+    sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "User's information retrieved successfully",

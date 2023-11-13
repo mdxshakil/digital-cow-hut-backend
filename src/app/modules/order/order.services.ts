@@ -226,6 +226,17 @@ const getOrderByTransactionId = async (
   return result;
 };
 
+const deliverOrder = async (orderId: string) => {
+  const result = await Order.updateOne(
+    { _id: orderId },
+    {
+      isDelivered: true,
+    }
+  );
+
+  return result;
+};
+
 export const OrderService = {
   placeOrder,
   getAllOrders,
@@ -233,4 +244,5 @@ export const OrderService = {
   successPayment,
   failedPayment,
   getOrderByTransactionId,
+  deliverOrder,
 };

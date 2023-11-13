@@ -78,6 +78,20 @@ const getOrderByTransactionId: RequestHandler = catchAsync(
   }
 );
 
+const deliverOrder: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+
+    const result = await OrderService.deliverOrder(orderId);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Order information retrived successfully',
+      data: result,
+    });
+  }
+);
+
 export const OrderController = {
   placeOrder,
   successPayment,
@@ -85,4 +99,5 @@ export const OrderController = {
   getSingleOrder,
   failedPayment,
   getOrderByTransactionId,
+  deliverOrder,
 };

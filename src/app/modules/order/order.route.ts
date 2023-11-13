@@ -34,4 +34,10 @@ router.get(
   OrderController.getOrderByTransactionId
 );
 
+router.patch(
+  '/deliver/:orderId',
+  authGuard(UserRole.ADMIN),
+  OrderController.deliverOrder
+);
+
 export const OrderRoutes = router;
