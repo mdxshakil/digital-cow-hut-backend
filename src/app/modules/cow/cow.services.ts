@@ -53,6 +53,9 @@ const getAllCows = async (
         if (field === 'maxPrice') {
           return { price: { $lte: value } };
         }
+        if (field === 'label' && value === 'all') {
+          return {};
+        }
         return { [field]: value };
       }),
     });
@@ -80,6 +83,7 @@ const getAllCows = async (
       page,
       limit,
       total,
+      pageCount: Math.ceil(total / limit),
     },
     data: result,
   };
@@ -115,13 +119,28 @@ const updateCow = async (
 
 const deleteCow = async (
   cowId: string,
-  sellerId: string
+  sellerId: string,
+  role: string
 ): Promise<ICow | null> => {
-  //check if the cow exists and the seller is valid
-  await verifyCowAndSeller(cowId, sellerId);
+  let result;
+  if (role === 'admin') {
+    result = await Cow.findByIdAndDelete({
+      _id: cowId,
+      label: { $ne: 'sold out' },
+    });
+  } else if (role === 'seller') {
+    // Check if the cow exists and the seller is valid
+    await verifyCowAndSeller(cowId, sellerId);
 
-  const cow = await Cow.findByIdAndDelete({ _id: cowId }).populate('seller');
-  return cow;
+    // Check if the cow is not sold out before deleting
+    result = await Cow.findByIdAndDelete({
+      _id: cowId,
+      label: { $ne: 'sold out' },
+    });
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Unauthorized access');
+  }
+  return result;
 };
 
 export const CowService = {

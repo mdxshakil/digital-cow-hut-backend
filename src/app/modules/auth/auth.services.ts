@@ -17,7 +17,6 @@ const createUser = async (userData: IUser): Promise<IUser | null> => {
 
 const loginUser = async (userLoginData: ILoginUser) => {
   const { phoneNumber, password } = userLoginData;
-
   const user = new User();
   const isUserExists = await user.isUserExists(phoneNumber);
   if (!isUserExists) {

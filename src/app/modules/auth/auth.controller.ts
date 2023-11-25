@@ -23,6 +23,7 @@ const createUser: RequestHandler = catchAsync(
 const loginUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const userLoginData = req.body;
+
     const result = await AuthService.loginUser(userLoginData);
 
     if (!result?.accessToken) {

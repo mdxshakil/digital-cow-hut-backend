@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import config from '../../../config';
+import { UserRole } from '../../../enums/userRole';
 import ApiError from '../../../errors/apiError';
-import { Admin } from '../admin/admin.model';
+import { Cow } from '../cow/cow.model';
+import { Order } from '../order/order.model';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -62,12 +64,22 @@ const updateUser = async (
 
 const getMyProfile = async (userId: string, role: string) => {
   let profile;
-  if (role === 'seller' || role === 'buyer') {
+  if (role === UserRole.ADMIN) {
     profile = await User.findOne({ _id: userId });
-  } else if (role === 'admin') {
-    profile = await Admin.findOne({ _id: userId });
+    return { profile };
+  } else if (role === UserRole.BUYER) {
+    const totalCowPurchased = await Order.count({ buyer: userId });
+    profile = await User.findOne({ _id: userId });
+    return { profile, totalCowPurchased };
+  } else if (role === UserRole.SELLER) {
+    const totalCowSold = await Cow.count({
+      $and: [{ seller: userId }, { label: 'sold out' }],
+    });
+    const profile = await User.findOne({ _id: userId });
+    return { profile, totalCowSold };
+  } else {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');
   }
-  return profile;
 };
 
 const updateMyProfile = async (
